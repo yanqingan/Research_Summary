@@ -1,9 +1,12 @@
 @2024, Qingan Yan（reference or citation is required for re-posting）
 
 # Preface
-I would like to list several keywords here, facilitating potential memory querying and review in the future.
+A personal reading log about the MVS depth estimation paper: 
+[Yan etal, MVSNet: Depth Inference for Unstructured Multi-view Stereo, ECCV 2018](https://arxiv.org/abs/1804.02505). 
 
-{relative pose}, {homography}, {cost volume}, {sharpness refinement}, {soft argmin}
+The note serves mainly for my understanding enhancement but open to any comments and discussions. I would like to list several keywords here, facilitating my potential memory querying and revisiting in the future.
+
+{mvsnet}, {relative pose}, {homography}, {cost volume}, {sharpness refinement}, {soft argmin}, {supervised}
 
 # Input
 Like normal MVS definition, the input are a reference image $\mathbf{I}_i$, estimating depth for, and several source images { $\mathbf{I}_j: j \in (1, 2,..., N)$ } with viewport variance.
