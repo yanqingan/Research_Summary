@@ -2,11 +2,14 @@
 
 # Preface
 A personal reading log about the MVS depth estimation paper: 
-[Yan etal, MVSNet: Depth Inference for Unstructured Multi-view Stereo, ECCV 2018](https://arxiv.org/abs/1804.02505). 
+[Yan et al, MVSNet: Depth Inference for Unstructured Multi-view Stereo, ECCV 2018](https://arxiv.org/abs/1804.02505). 
 
 The note serves mainly for my understanding enhancement but open to any comments and discussions. I would like to list several keywords here, facilitating my potential memory querying and revisiting in the future.
 
 {mvsnet}, {relative pose}, {homography}, {cost volume}, {sharpness refinement}, {soft argmin}, {supervised}
+
+# Motivation
+Measuring the 3D volumetric consistency across multiple views in reference image coordinate. With designed depth, the projected feature volumes from different views observing a common scenario should have less discrepancy conflict, i.e., variance.
 
 # Input
 Like normal MVS definition, the input are a reference image $\mathbf{I}_i$, estimating depth for, and several source images { $\mathbf{I}_j: j \in (1, 2,..., N)$ } with viewport variance.
