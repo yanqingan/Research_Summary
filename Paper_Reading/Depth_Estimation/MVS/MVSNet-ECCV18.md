@@ -1,6 +1,6 @@
-@2024, Qingan Yan（reference or citation is required for re-posting）
+**@2024, Qingan Yan (reference or citation is required for re-posting)**
 
-# Preface
+## Preface
 A personal reading log about the MVS depth estimation paper: 
 [Yan et al, MVSNet: Depth Inference for Unstructured Multi-view Stereo, ECCV 2018](https://arxiv.org/abs/1804.02505). 
 
@@ -8,13 +8,13 @@ The note serves mainly for my understanding enhancement but open to any comments
 
 {mvsnet}, {relative pose}, {homography}, {cost volume}, {sharpness refinement}, {soft argmin}, {supervised}
 
-# Motivation
+## Motivation
 Measuring the 3D volumetric consistency across multiple views in reference image coordinate. With designed depth, the projected feature volumes from different views observing a common scenario should have less discrepancy conflict, i.e., variance.
 
-# Input
+## Input
 Like normal MVS definition, the input are a reference image $\mathbf{I}_i$, estimating depth for, and several source images { $\mathbf{I}_j: j \in (1, 2,..., N)$ } with viewport variance.
 
-# Prerequisite
+## Prerequisite
 Assume the image resolution is $[3, 512, 640]$. Remember to resize intrinsic parameters whenever a down-sampling is applied. Like the vanilla plane-sweeping scheme, the 3D space is uniformly sliced into a sequence of depth samples. For a $[425, 935] mm$ distance and sampling at every $2 mm$, then the depth resolution $D$ would be 256; for $[425, 902.5] mm$, $D = 192$ with stride of $2.5 mm$. So the task is equal to classify each pixel into proper slice.
 
 In order to achieve this, we have to resort to the homography, a.k.a, planar transformation, to establish the bridge between depth and correspondence. A homography is a $3 \times 3$ matrix with $DoF = 8$ and is only good for depicting transformation of the major planar region, leaving other planar layers within the reference image poorly fitted. Pure rotation is its special case which regards the whole image as a plane. However, with depth varying, there would be multiple homography matrices projecting each pixel at different scale to locate which correspondence in source image it should associate to. Note that here backward-projection (from $\mathbf{I}_i$ to $\mathbf{I}_j$) is adopted to ensure matching completeness. Specifically,
@@ -95,13 +95,13 @@ $$
 
 Applying the intrinsic projection, it will be in the final form of Eq.(2).
 
-# Feature Extraction
+## Feature Extraction
 This step uses Conv layers to extract features from each image, i.e., $N + 1$ feature images. The resulting feature map is $1 / 4$ as of the original size in spatial and $32$ in channel. The encoder shares weights across all feature maps, i.e., derived from the same network.
 
-# Feature Volumes
+## Feature Volumes
 Now we have $[N + 1, 32, 128, 160]$ feature maps. The construction of feature volumes is to warp them, using Eq.(2), into reference coordinate under different depth scales. This will form $D$ new feature maps for each image, i.e., $[N + 1, D, 32, 128, 160]$. Here each $\mathbf{V}_i \in [D, 32, 128, 160]$ corresponds to a feature volume.
 
-# Cost Volume
+## Cost Volume
 Since the homography process helps to establish correspondences across different views, the truly matched pixels should have similar features subject to $d$. So by aggregating all feature volumes into one, the final formed volume $\mathbf{C} \in [D, 32, 128, 160]$, a.k.a., cost volume, measures the variance of feature similarity along the first dimension. 
 
 $$
@@ -110,7 +110,7 @@ $$
 
 $\bar{\mathbf{V}}$ is the average volume among all feature volumes. Think about putting multiple cubic blocks virtually at the same location. Ideally, although there are some regions under-constraint or in improper depth, sufficiently overlapped observations ought to be consistent at designed depth and push down total variance. The cost volume conducting optimizations from a 3D and holistic perspective would be more stable compared to directly regressing geometric knowledge from 2D feature maps. The cost volume representation also makes the algorithm independent of input image numbers.
 
-# Probability Volume
+## Probability Volume
 As claimed previously, the depth estimation problem equals to a classification within $D$ depth slices. Therefore, the cost volume has to be further transformed to be able to describe the probability distribution of each pixel in a predefined spatial scope, i.e., $\mathbf{C} \in [D, 32, 128, 160] \stackrel{3D \ Conv}{\longrightarrow} \mathbf{P} \in [D, 1, 128, 160] \stackrel{squeeze}{\longrightarrow} [D, 128, 160]$. Due to the additional $D$ dimension, 3D Conv is required rather than 2D Conv. Consequently, the $softmax$ operation can be applied along the $D$ depth direction for probability normalization.
 
 As the loss is MSE not CE, the winner-take-all $argmax$ is neither able to produce sub-pixel estimation nor differentiable. Instead, taking the $expectation$ could help to resolve these problems
@@ -121,7 +121,7 @@ $$
 
 This operation is also referred to as $soft \ argmin$.
 
-# Sharpness Refinement
+## Sharpness Refinement
 As for the common issue of over-smoothness, referring to image matting, a depth residual module is added at the end by incorporating high-frequency information from reference image. Estimated depth map $\hat{\mathbf{d}}$ is concatenated with $\mathbf{I}_i$ as 4-channel input, passing through three 32-channel 2D Conv layers followed by one 1-channel layer to learn the residual, then $\hat{\mathbf{d}}$ is added to get refined depth $\widetilde{\mathbf{d}}$. No BN and ReLU for the last layer. To prevent being biased at a certain depth scale, the initial depth magnitude is scaled to range $[0, 1]$, and converted back after the refinement. The final loss is
 
 $$
@@ -130,7 +130,7 @@ $$
 
 where $\mathbf{P}_{valid}$ indicates those pixels with valid ground truth.
 
-# Summary
+## Summary
 Pros
 - From feature maps to feature volumes and cost volume then probability volume, the whole pipeline is intuitive and deserves a careful code reading.
 
