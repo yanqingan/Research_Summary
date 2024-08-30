@@ -9,7 +9,7 @@ The note serves mainly for my understanding enhancement but open to any comments
 {mobilenet}, {separable convolution}, {1*1 convolution}
 
 ## Motivation
-Standard 2D convolution operation can be factorized into one convolution processing per each spatial map and one fusing along depth channel subsequently. This linear combination can substantially reduce network computation.
+Standard 2D convolution operation can be factorized into one convolution processing as per each spatial map and one fusing along depth channel subsequently. This linear combination can substantially reduce network computation.
 
 ## Depthwise Separable Convolution
 Normally a 2D convolution kernel shapes like $[D_I, H_K, W_K]$ which jointly considers values in spatial domain as well as along depth channel. So for a input map $[D_I, H, W]$, a standard 2D convolution layer produces a new $[D_O, H, W]$ feature map if no downsampling is applied, in which there are $D_O$ 2D convolution kernels $[D_I, H_K, W_K]$ operating on each _pixel_, i.e., a computation equals to $D_O \times (D_I \times H_K \times W_K) \times (H \times W)$. Note that for the sake of distinction in the following description, I refer the _element_ to be more primitive scalar, while _pixel_ stands for vector format with depth dimension.
