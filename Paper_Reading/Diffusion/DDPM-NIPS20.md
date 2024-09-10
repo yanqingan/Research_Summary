@@ -39,7 +39,7 @@ A common way to calculate unknown parameters of a variational distribution is [m
 = \text{E}_{q_{\phi}(z | x)}[\ln \frac{p(x, z)}{q_{\phi}(z | x)}] + \text{E}_{q_{\phi}(z | x)}[\ln \frac{q_{\phi}(x | z)}{p(x | z)}]
 ```
 ```math
-= \text{E}_{q_{\phi}(z | x)}[\ln \frac{p(x, z)}{q_{\phi}(z | x)}] + D_{KL}(q_{\phi}(x | z) \| p(x | z))
+= \text{E}_{q_{\phi}(z | x)}[\ln \frac{p(x, z)}{q_{\phi}(z | x)}] + \text{D}_{KL}(q_{\phi}(x | z) \| p(x | z))
 ```
 ```math
 \geq \text{E}_{q_{\phi}(z | x)}[\ln \frac{p(x, z)}{q_{\phi}(z | x)}]. \quad (2)
@@ -58,7 +58,7 @@ true posterior $p(z | x)$, leading to $D_{KL} = 0$. However, a problem still rem
 = \text{E}_{q_{\phi}(z | x)}[\ln p(x | z)] + \text{E}_{q_{\phi}(z | x)}[\ln \frac{p(z)}{q_{\phi}(z | x)}]
 ```
 ```math
-= \text{E}_{q_{\phi}(z | x)}[\ln p(x | z)] - D_{KL}(q_{\phi}(z | x) \| p(z)). \quad (3)
+= \text{E}_{q_{\phi}(z | x)}[\ln p(x | z)] - \text{D}_{KL}(q_{\phi}(z | x) \| p(z)). \quad (3)
 ```
 The first term measures the reconstruction likelihood of two distributions. It is easy to imagine that in order to maximize this term, lower probabilities in $p(x | z)$ should also correspond to lower values in $q_{\phi}(z | x)$ and vice versa. This implies that $x$ and $z$ should have distinct association among other potential representations. To simulate the behavior, one feasible solution is to use an _encoder_ network learning the distribution of $q_{\phi}(z | x)$ and another _decoder_ network expressing the distribution of $p_{\theta}(x | z)$. So VAE is a kind of AEs but outputs distribution parameters for feature sampling instead of direct features. Nevertheless, solving the term solely may involve many potential distributions. One commonly used easy proxy is Gaussian distribution. Therefore, we can assume the prior $p(z)$ meets a standard isotropic Gaussian distribution $p(z) \sim N(z; 0, I)$ and $q_{\phi}(z | x)$ ought to be approaching it as much as possible, which is elegantly depicted in the second prior matching term. By simplifying the reconstruction term via a Monte Carlo estimate, the maximization can be rewritten:
 ```math
@@ -90,6 +90,35 @@ Many diffusion models want at first the perturbation to be small but increase as
 q(x_t | x_{t - 1}) = N(x_t; \sqrt{1 - \beta_t}x_{t - 1}, \beta_t I). \quad (8)
 ```
 The scheduler can also be learned or act in a _variance-exploding_ manner. I will try to cover them with corresponding papers in other logs.
+
+Let's recall the ELBO of Eq.(2); in terms of diffusion models, it reformulates to:
+```math
+\text{E}_{q_{\phi}(z | x)}[\ln \frac{p(x, z)}{q_{\phi}(z | x)}] = \text{E}_{q(x_{1 : T} | x_0)}[\ln \frac{p(x_0, x_{1 : T})}{q(x_{1 : T} | x_0)}] 
+```
+```math
+= \text{E}_{q(x_{1 : T} | x_0)}[\ln \frac{p(x_T) \prod \limits^T_{t = 1} p_{\theta}(x_{t - 1} | x_t)}{\prod \limits^T_{t = 1} q(x_t | x_{t - 1})}]
+```
+```math
+= \text{E}_{q(x_{1 : T} | x_0)}[\ln \frac{p(x_T) p_{\theta}(x_0 | x_1)}{q(x_T | x_{T - 1})}]
++ \text{E}_{q(x_{1 : T} | x_0)}[\ln \prod \limits^{T - 1}_{t = 1} \frac{ p_{\theta}(x_t | x_{t + 1})}{q(x_t | x_{t - 1})}]
+```
+```math
+= \text{E}_{q(x_{1 : T} | x_0)}[\ln p_{\theta}(x_0 | x_1)]
++ \text{E}_{q(x_{1 : T} | x_0)}[\ln \frac{p(x_T)}{q(x_T | x_{T - 1})}]
++ \prod \limits^{T - 1}_{t = 1} \text{E}_{q(x_{1 : T} | x_0)}[\ln \frac{ p_{\theta}(x_t | x_{t + 1})}{q(x_t | x_{t - 1})}]
+```
+```math
+= \text{E}_{q(x_1 | x_0)}[\ln p_{\theta}(x_0 | x_1)]
++ \text{E}_{q(x_{T - 1}, x_T | x_0)}[\ln \frac{p(x_T)}{q(x_T | x_{T - 1})}]
++ \prod \limits^{T - 1}_{t = 1} \text{E}_{q(x_{t - 1}, x_t, x_{t + 1} | x_0)}[\ln \frac{p_{\theta}(x_t | x_{t + 1})}{q(x_t | x_{t - 1})}] \quad (9)
+```
+```math
+= \text{E}_{q(x_1 | x_0)}[\ln p_{\theta}(x_0 | x_1)]
+- \text{E}_{q(x_{T - 1} | x_0)}[\text{D}_{KL}(q(x_T | x_{T - 1}) \| p(x_T))]
+- \prod \limits^{T - 1}_{t = 1} \text{E}_{q(x_{t - 1}, x_{t + 1} | x_0)}[\text{D}_{KL}(q(x_t | x_{t - 1}) \| p_{\theta}(x_t | x_{t + 1}))]. \quad (10)
+```
+So this is the initial expanded formulation of ELBO in likelihood diffusion models. For the transmit between Eq.(9) and Eq.(10), it can be derived by expanding $q(x_{T - 1}, x_T | x_0)$ and $q(x_{t - 1}, x_t, x_{t + 1} | x_0)$ into $q(x_{T - 1} | x_0) q(x_T | x_{T - 1}) $ and $q(x_{t - 1}, x_{t + 1} | x_0) q(x_t | x_{t - 1})$.
+
 
 A good property of ...
 
