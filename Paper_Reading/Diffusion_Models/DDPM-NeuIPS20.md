@@ -338,9 +338,9 @@ Overall, because of $\bar{\alpha}_1$ = $\alpha_1$, the simplified training loss 
 
 In inference, in contrast to the other steps, the last transmit directly utilizes the estimated mean 
 ```math
-\frac{1}{\sqrt{\alpha_1}} x_1 - \frac{1 - \alpha_1}{\sqrt{1 - \bar{\alpha}_1} \sqrt{\alpha_1}} \epsilon_{\theta}(x_1, 1) \quad (24)
+\hat{x}_0 = \mu_{\theta}(x_1, 1) = \frac{1}{\sqrt{\alpha_1}} x_1 - \frac{1 - \alpha_1}{\sqrt{1 - \bar{\alpha}_1} \sqrt{\alpha_1}} \epsilon_{\theta}(x_1, 1) \quad (24)
 ``` 
-as final output $\hat{x}_0$ rather than drawing a sample from the distribution. This is because: (1) It is regularized in the reconstruction term; (2) It can improve the determinism as the last step has very low variance.
+as final output rather than a sample drawing from the distribution. This is because: (1) It is regularized in the reconstruction term; (2) It can improve the determinism as the last step has very low variance.
 
 ## Summary
 1. Due to the Markovian chain hypothesis, DDPM prefers the transmit to be approximately contiguous. So it requires a long and cosy sampling path, usually $1000$ steps, in order to get a generative output.
