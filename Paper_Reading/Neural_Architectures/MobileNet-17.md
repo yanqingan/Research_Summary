@@ -1,10 +1,10 @@
-**@2024, Qingan Yan (reference or citation is required for re-posting)**
+**@ 2024 Qingan Yan. Reference or citation is required for re-posting.**
 
 ## Preface
 A personal reading log about the light-weight network paper: 
-[Howard et al, MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications](https://arxiv.org/abs/1704.04861). 
+[A. Howard, et al. MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications, 2017](https://arxiv.org/abs/1704.04861). 
 
-The note serves mainly for my understanding enhancement but open to any comments and discussions. I would like to list several keywords here, facilitating my potential memory querying and revisiting in the future.
+The note serves mainly for my understanding enhancement but is open to any comments and discussions. I would like to list several keywords here, facilitating my potential memory querying and revisiting in the future.
 
 {mobilenet}, {separable convolution}, {1*1 convolution}
 

@@ -1,10 +1,10 @@
-**@2024, Qingan Yan (reference or citation is required for re-posting)**
+**@ 2024 Qingan Yan. Reference or citation is required for re-posting.**
 
 ## Preface
 A personal reading log about the MVS depth estimation paper: 
-[Yan et al, MVSNet: Depth Inference for Unstructured Multi-view Stereo, ECCV 2018](https://arxiv.org/abs/1804.02505). 
+[Y. Yan, et al. MVSNet: Depth Inference for Unstructured Multi-view Stereo, ECCV 2018](https://arxiv.org/abs/1804.02505). 
 
-The note serves mainly for my understanding enhancement but open to any comments and discussions. I would like to list several keywords here, facilitating my potential memory querying and revisiting in the future.
+The note serves mainly for my understanding enhancement but is open to any comments and discussions. I would like to list several keywords here, facilitating my potential memory querying and revisiting in the future.
 
 {mvsnet}, {relative pose}, {homography}, {cost volume}, {sharpness refinement}, {soft argmin}, {supervised}
 
