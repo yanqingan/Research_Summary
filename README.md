@@ -1,5 +1,5 @@
 # QAY's Research Summary
-A memory bank for myself. Constructing... subject to... time...
+A memory palace for myself. Constructing... subject to... time and mood...
 
 ## Table of Contents
 - [✨ Paper Reading Logs](./Paper_Reading/README.md)
