@@ -23,75 +23,73 @@ In order to achieve this, we have to resort to the homography, a.k.a, planar tra
 x_j = \mathbf{H}_{ji}(d) \cdot x_i, \quad (1)
 ```
 
-$$
+```math
 \mathbf{H}_{ji}(d) = \mathbf{K}_j \cdot \mathbf{R}_j \cdot (\mathbf{I} - \frac{(\mathbf{R}^T_j \cdot \mathbf{t}_j - \mathbf{R}^T_i \cdot \mathbf{t}_i) \cdot n^T_i \cdot \mathbf{R}_i}{d}) \cdot \mathbf{R}^T_i \cdot \mathbf{K}^{-1}_i. \quad (2)
-$$
+```
 
 Notable that the equation in original paper is incorrect; the listed one is what the authors actually use in code. Normally $n_i$ is the plane normal and $d$ is the offset. Since depth slices are fronto-parallel in our case, so they are equivalent to the principle axis of reference camera and corresponding depth. $[\mathbf{R} | \mathbf{t}]$ is from world-to-camera. To further derivate the equation,
 
-$$
-%\begin{equation}
-X_j = \mathbf{R}_{ ji } \cdot X_i + \mathbf{t}\_{ji}. \quad (3)
-%\end{equation}
-$$
+```math
+X_j = \mathbf{R}_{ ji } \cdot X_i + \mathbf{t}_{ji}. \quad (3)
+```
 
 Since local 3D points $X_i = d^{-1} \cdot \mathbf{K}^{-1}_i \cdot x_i$ locate on the depth plane, thus
 
-$$
+```math
 n^T_i \cdot X_i + d = 0, \quad (4)
-$$
+```
 
-$$
+```math
 -\frac{n^T_i \cdot X_i}{d} = 1, \quad (5)
-$$
+```
 
-$$
+```math
 \mathbf{t} = \mathbf{t} \cdot (-\frac{n^T \cdot X}{d}). \quad (6)
-$$
+```
 
 Calculating the relative pose, we get
 
-$$
+```math
 \begin{bmatrix}
-\mathbf{R}\_{ji} & \mathbf{t}\_{ji} \\
+\mathbf{R}_{ji} & \mathbf{t}_{ji} \\
 \mathbf{0}^T & 1 \\
-\end{bmatrix}\_{4 \times 4} =
+\end{bmatrix}_{4 \times 4} =
 \begin{bmatrix}
-\mathbf{R}\_j & \mathbf{t}\_j \\
+\mathbf{R}_j & \mathbf{t}_j \\
 \mathbf{0}^T & 1 \\
-\end{bmatrix}\_{4 \times 4} 
+\end{bmatrix}_{4 \times 4} 
 \cdot
 \begin{bmatrix}
-\mathbf{R}\_i & \mathbf{t}\_j \\
+\mathbf{R}_i & \mathbf{t}_j \\
 \mathbf{0}^T & 1 \\
-\end{bmatrix}^{-1}\_{4 \times 4} =
+\end{bmatrix}^{-1}_{4 \times 4} =
 \begin{bmatrix}
-\mathbf{R}\_j & \mathbf{t}\_j \\
+\mathbf{R}_j & \mathbf{t}_j \\
 \mathbf{0}^T & 1 \\
-\end{bmatrix}\_{4 \times 4} \cdot
+\end{bmatrix}_{4 \times 4} \cdot
 \begin{bmatrix}
-\mathbf{R}^T_i & -\mathbf{R}^T_i \cdot \mathbf{t}\_j \\
+\mathbf{R}^T_i & -\mathbf{R}^T_i \cdot \mathbf{t}_j \\
 \mathbf{0}^T & 1 \\
-\end{bmatrix}\_{4 \times 4} =
+\end{bmatrix}_{4 \times 4} =
 \begin{bmatrix}
-\mathbf{R}\_{ji} & \mathbf{t}\_{ji} \\
+\mathbf{R}_{ji} & \mathbf{t}_{ji} \\
 \mathbf{0}^T & 1 \\
-\end{bmatrix}\_{4 \times 4} =
+\end{bmatrix}_{4 \times 4} =
 \begin{bmatrix}
-\mathbf{R}\_j \cdot \mathbf{R}^T_i & -\mathbf{R}\_j \cdot \mathbf{R}^T_i \cdot \mathbf{t}\_i + \mathbf{t}\_j \\
+\mathbf{R}_j \cdot \mathbf{R}^T_i & -\mathbf{R}_j \cdot \mathbf{R}^T_i \cdot \mathbf{t}_i + \mathbf{t}_j \\
 \mathbf{0}^T & 1 \\
 \end{bmatrix}_{4 \times 4}. \quad (7)
-$$
+```
 
 Put them together into Eq.(3),
 
-$$
+```math
 X_j = \mathbf{R}_j \cdot \mathbf{R}^T_i \cdot X_i - (\mathbf{t}_j - \mathbf{R}_j \cdot \mathbf{R}^T_i \cdot \mathbf{t}_i) \cdot \frac{n^T_i \cdot X_i}{d}, \quad (8)
-$$
+```
 
-$$
+```math
 X_j = \mathbf{R}_j (\mathbf{I} - (\mathbf{R}^T_j \cdot \mathbf{t}_j - \mathbf{R}^T_i \cdot \mathbf{t}_i) \cdot \frac{n^T_i}{d} \cdot \mathbf{R}_i) \cdot \mathbf{R}^T_i \cdot X_i. \quad (9)
-$$
+```
 
 Applying the intrinsic projection, it will be in the final form of Eq.(2).
 
@@ -115,18 +113,18 @@ As claimed previously, the depth estimation problem equals to a classification w
 
 As the loss is MSE not CE, the winner-take-all $argmax$ is neither able to produce sub-pixel estimation nor differentiable. Instead, taking the $expectation$ could help to resolve these problems
 
-$$
+```math
 \hat d = \sum \limits^{dmax}_{d = dmin} d \times \mathbf{P}(d). \quad (11)
-$$
+```
 
 This operation is also referred to as $soft \ argmin$.
 
 ## Sharpness Refinement
 As for the common issue of over-smoothness, referring to image matting, a depth residual module is added at the end by incorporating high-frequency information from reference image. Estimated depth map $\hat{\mathbf{d}}$ is concatenated with $\mathbf{I}_i$ as 4-channel input, passing through three 32-channel 2D Conv layers followed by one 1-channel layer to learn the residual, then $\hat{\mathbf{d}}$ is added to get refined depth $\widetilde{\mathbf{d}}$. No BN and ReLU for the last layer. To prevent being biased at a certain depth scale, the initial depth magnitude is scaled to range $[0, 1]$, and converted back after the refinement. The final loss is
 
-$$
+```math
 Loss = \sum \limits_{p \in \mathbf{P}_{valid}} \| \mathbf{d}(p) - \hat{\mathbf{d}}(p) \|_1 + \lambda \| \mathbf{d}(p) - \widetilde{\mathbf{d}}(p) \|_1, \quad (12)
-$$
+```
 
 where $\mathbf{P}_{valid}$ indicates those pixels with valid ground truth.
 
