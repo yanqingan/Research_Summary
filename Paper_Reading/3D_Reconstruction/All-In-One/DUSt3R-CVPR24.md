@@ -28,7 +28,7 @@ with $P \in \text{R}^{3 \times 4}$ the world-to-camera pose and the homogeneous 
 
 __Input and Output__. Input two RGB images $I^1, I^2 \in \text{R}^{W * H * 3}$, output two pointmaps $X^{1, 1}, X^{2, 1} \in \text{R}^{W * H * 3}$ with associated confidence maps $C^{1, 1}, C^{2, 1} \in \text{R}^{W * H}$ both in the coordinate of $I^1$.
 
-__Network Architecture__. Since two images serve as input, so Siamese structure is adopted where two identical branches with weight-sharing encode each image separately, i.e., $F^1 = Encoder(I^1)$, $F^2 = Encoder(I^2)$. The encoder specifically is ViT-Large. The decoder follows ViT-Base, comprising $B$ repeating functional blocks and a MLP head. Each block sequentially performs self-attention and cross-attention. Self-attention draws relationship within one image, yet cross-attention mixes knowledge with the other image.
+__Network Architecture__. Since two images serve as input, so Siamese structure is adopted where two identical branches with weight-sharing encode each image separately, i.e., $F^1 = Encoder(I^1)$, $F^2 = Encoder(I^2)$. The encoder specifically is ViT-Large. The decoder follows ViT-Base, comprising $B$ repeating functional blocks and a MLP head, and initially $G^1_0 = F^1$ and $G^2_0 = F^2$. Each block sequentially performs self-attention and cross-attention. Self-attention draws relationship within one image, yet cross-attention mixes knowledge with the other image.
 ```math
 G^1_i = \text{DecoderBlock}^1_i(G^1_{i - 1}, G^2_{i - 1}),
 ```
